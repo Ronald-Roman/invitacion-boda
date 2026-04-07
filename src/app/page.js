@@ -11,6 +11,17 @@ export default function Home() {
   const [asistencia, setAsistencia] = useState("");
   const [regalo, setRegalo] = useState("");
   const [yaConfirmado, setYaConfirmado] = useState(false);
+  const [showModal, setShowModal] = useState(false);
+  const [modalTitle, setModalTitle] = useState("");
+  const [modalMessage, setModalMessage] = useState("");
+  const [modalIcon, setModalIcon] = useState("");
+
+  function mostrarModal(titulo, mensaje, icono = "warning") {
+    setModalTitle(titulo);
+    setModalMessage(mensaje);
+    setModalIcon(icono);
+    setShowModal(true);
+  }
 
   useEffect(() => {
 
@@ -51,7 +62,7 @@ export default function Home() {
   async function confirmar() {
 
     if (!regalo) {
-      alert("Por favor selecciona un regalo antes de confirmar tu asistencia.");
+      mostrarModal("¡Falta seleccionar regalo!", "Por favor selecciona un regalo antes de confirmar tu asistencia.", "warning");
       return;
     }
 
@@ -68,7 +79,7 @@ export default function Home() {
       .eq("codigo", codigo);
 
     setYaConfirmado(true);
-    alert("Gracias por confirmar ❤️");
+    mostrarModal("¡Confirmación exitosa!", "Gracias por confirmar tu asistencia. ¡Te esperamos en nuestra boda! ❤️", "success");
 
   }
 
@@ -662,6 +673,45 @@ export default function Home() {
           <p className="text-[var(--text-soft)] text-sm font-light">
             Cualquier duda o cambio de opinión, contáctanos directamente al WhatsApp: +56950596046
           </p>
+        </div>
+      )}
+
+      {/* Modal personalizado */}
+      {showModal && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white/95 backdrop-blur-md rounded-2xl shadow-2xl border border-[var(--sage)]/30 max-w-md w-full p-8 text-center relative">
+            {/* Ícono */}
+            <div className="mb-4 flex justify-center">
+              {modalIcon === "warning" && (
+                <svg className="w-16 h-16 text-[var(--gold)]" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                </svg>
+              )}
+              {modalIcon === "success" && (
+                <svg className="w-16 h-16 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                </svg>
+              )}
+            </div>
+
+            {/* Título */}
+            <h3 className="text-2xl font-bold text-[var(--sage-deep)] mb-4" style={{ fontFamily: "'Playfair Display', serif" }}>
+              {modalTitle}
+            </h3>
+
+            {/* Mensaje */}
+            <p className="text-[var(--text)] mb-6 leading-relaxed">
+              {modalMessage}
+            </p>
+
+            {/* Botón cerrar */}
+            <button
+              onClick={() => setShowModal(false)}
+              className="px-6 py-3 bg-[var(--gold)] text-white rounded-full font-semibold hover:bg-[var(--gold)]/80 transition-colors"
+            >
+              Entendido
+            </button>
+          </div>
         </div>
       )}
 
