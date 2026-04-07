@@ -11,6 +11,7 @@ export default function Home() {
   const [asistencia, setAsistencia] = useState("");
   const [regalo, setRegalo] = useState("");
   const [yaConfirmado, setYaConfirmado] = useState(false);
+  const [errorMensaje, setErrorMensaje] = useState("");
 
   useEffect(() => {
 
@@ -51,7 +52,7 @@ export default function Home() {
   async function confirmar() {
 
     if (!regalo) {
-      alert("Por favor selecciona un regalo antes de confirmar tu asistencia.");
+      setErrorMensaje("Por favor selecciona un regalo antes de confirmar tu asistencia.");
       return;
     }
 
@@ -372,7 +373,7 @@ export default function Home() {
                   ? 'border-2 border-[var(--gold)] shadow-[0_0_20px_rgba(215,181,109,0.3)] scale-[1.02]'
                   : 'border border-[var(--sage)]/30 shadow-lg hover:shadow-xl hover:-translate-y-1'
                   }`}
-                onClick={() => !yaConfirmado && setRegalo(opt.id)}
+                onClick={() => !yaConfirmado && (setRegalo(opt.id), setErrorMensaje(""))}
               >
                 {/* Imagen estilo card-img-top */}
                 <div className="w-full h-48 md:h-56 overflow-hidden relative">
@@ -401,7 +402,7 @@ export default function Home() {
                   </div>
 
                   <button
-                    onClick={(e) => { e.stopPropagation(); !yaConfirmado && setRegalo(opt.id); }}
+                    onClick={(e) => { e.stopPropagation(); !yaConfirmado && (setRegalo(opt.id), setErrorMensaje("")); }}
                     disabled={yaConfirmado}
                     className={`px-8 py-3 rounded-full uppercase tracking-[0.2em] text-[0.75rem] font-semibold transition-all duration-300 w-full sm:w-auto ${regalo === opt.id
                       ? 'bg-[var(--gold)] text-white shadow-md border border-[var(--gold)]'
@@ -426,7 +427,7 @@ export default function Home() {
               ? 'border-2 border-[var(--gold)] shadow-[0_0_40px_rgba(215,181,109,0.5)] scale-[1.02]'
               : 'border border-[#3a4439] hover:shadow-[0_0_20px_rgba(215,181,109,0.2)] hover:-translate-y-1'
               }`}
-            onClick={() => !yaConfirmado && setRegalo("opcionVIP")}
+            onClick={() => !yaConfirmado && (setRegalo("opcionVIP"), setErrorMensaje(""))}
           >
             {/* Imagen Especial VIP */}
             <div className="w-full md:w-5/12 h-64 md:h-auto overflow-hidden relative border-r border-[#3a4439]">
@@ -464,7 +465,7 @@ export default function Home() {
                   $400.000
                 </span>
                 <button
-                  onClick={(e) => { e.stopPropagation(); setRegalo("opcionVIP"); }}
+                  onClick={(e) => { e.stopPropagation(); setRegalo("opcionVIP"), setErrorMensaje(""); }}
                   className={`px-10 py-3 uppercase tracking-[0.2em] text-[0.75rem] font-bold transition-all duration-300 w-full sm:w-auto rounded-full ${regalo === "opcionVIP"
                     ? 'bg-[var(--gold)] text-[#1c221f] shadow-[0_0_15px_rgba(215,181,109,0.4)]'
                     : 'bg-transparent text-[var(--gold)] border border-[var(--gold)] hover:bg-[var(--gold)] hover:text-[#1c221f]'
@@ -637,6 +638,12 @@ export default function Home() {
           <img src="/subaru.png?v=3" alt="" className="btn-car" />
         </div>
       </button>
+
+      {errorMensaje && (
+        <p className="text-red-600 font-semibold text-center mt-4 px-4">
+          {errorMensaje}
+        </p>
+      )}
 
       {yaConfirmado && (
         <div className="text-center mt-8 px-4">
