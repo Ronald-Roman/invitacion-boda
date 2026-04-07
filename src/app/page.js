@@ -375,10 +375,10 @@ export default function Home() {
         <div className="w-full flex justify-center">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-10 max-w-4xl mx-auto px-4 w-full">
             {[
-              { id: "opcion1", title: "Estanque Lleno!", desc: "Ayúdanos a llenar el estanque de nuestra camioneta para nuestros viajes.", img: "/regalos/l200.jpg", price: "$70.000" },
-              { id: "opcion2", title: "Cena romántica", desc: "Invítanos a una cena inolvidable para celebrar nuestro compromiso matrimonial.", img: "/regalos/cena.jpg", price: "$140.000" },
-              { id: "opcion3", title: "Noche de SPA!", desc: "Regálanos un día de relajación total y masajes para después de la gran fiesta.", img: "/regalos/spa.jpg", price: "$200.000" },
-              { id: "opcion4", title: "Viaje a la Playa", desc: "Un aporte para un viaje de desconexión a la playa.", img: "/regalos/playa.jpg", price: "$300.000" }
+              { id: "estanque", title: "Estanque Lleno!", desc: "Ayúdanos a llenar el estanque de nuestra camioneta para nuestros viajes.", img: "/regalos/l200.jpg", price: "$70.000" },
+              { id: "cena", title: "Cena romántica", desc: "Invítanos a una cena inolvidable para celebrar nuestro compromiso matrimonial.", img: "/regalos/cena.jpg", price: "$140.000" },
+              { id: "spa", title: "Noche de SPA!", desc: "Regálanos un día de relajación total y masajes para después de la gran fiesta.", img: "/regalos/spa.jpg", price: "$200.000" },
+              { id: "viaje", title: "Viaje a la Playa", desc: "Un aporte para un viaje de desconexión a la playa.", img: "/regalos/playa.jpg", price: "$300.000" }
             ].map((opt) => (
               <div
                 key={opt.id}
@@ -440,7 +440,7 @@ export default function Home() {
               ? 'border-2 border-[var(--gold)] shadow-[0_0_40px_rgba(215,181,109,0.5)] scale-[1.02]'
               : 'border border-[#3a4439] hover:shadow-[0_0_20px_rgba(215,181,109,0.2)] hover:-translate-y-1'
               }`}
-            onClick={() => !yaConfirmado && setRegalo("opcionVIP")}
+            onClick={() => !yaConfirmado && setRegalo("VIP")}
           >
             {/* Imagen Especial VIP */}
             <div className="w-full md:w-5/12 h-64 md:h-auto overflow-hidden relative border-r border-[#3a4439]">
