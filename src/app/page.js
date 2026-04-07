@@ -16,7 +16,10 @@ export default function Home() {
     const params = new URLSearchParams(window.location.search);
     const codigo = params.get("codigo");
 
-    if (!codigo) return;
+    if (!codigo) {
+      setInvitado({ error: true });
+      return;
+    }
 
     async function obtenerInvitado() {
 
@@ -26,7 +29,11 @@ export default function Home() {
         .eq("codigo", codigo)
         .single();
 
-      setInvitado(data);
+      if (data) {
+        setInvitado(data);
+      } else {
+        setInvitado({ error: true, dbError: true });
+      }
 
     }
 
@@ -54,7 +61,26 @@ export default function Home() {
   }
 
   if (!invitado) {
-    return <p>Cargando invitación...</p>;
+    return (
+      <div className="flex w-full h-screen items-center justify-center bg-[#fdfaf6]">
+        <p className="text-[var(--sage-deep)] text-2xl animate-pulse" style={{ fontFamily: "'Playfair Display', serif" }}>
+          Cargando invitación...
+        </p>
+      </div>
+    );
+  }
+
+  if (invitado.error) {
+    return (
+      <div className="flex w-full h-screen items-center justify-center flex-col bg-[#fdfaf6] px-6 text-center">
+         <h1 className="text-3xl text-[var(--sage-deep)] mb-4" style={{ fontFamily: "'Playfair Display', serif" }}>
+           Acceso Inválido
+         </h1>
+         <p className="text-[var(--text-soft)] max-w-[400px]">
+           Por favor, asegúrate de utilizar el enlace exacto que te enviaron los novios (el cual incluye tu código de invitado especial).
+         </p>
+      </div>
+    );
   }
 
   return (
