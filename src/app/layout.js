@@ -17,6 +17,13 @@ export const metadata = {
   icons: {
     icon: "/logo.png",
   },
+  openGraph: {
+    title: "Invitación de Boda - Fernanda & Benjamín",
+    description: "Únete a la celebración de nuestra boda. Confirma tu asistencia y elige tu regalo especial.",
+    image: "/logo.png",
+    url: process.env.NEXT_PUBLIC_BASE_URL || "https://invitacion-boda.vercel.app",
+    type: "website",
+  },
 };
 
 export default function RootLayout({ children }) {
