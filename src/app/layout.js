@@ -14,6 +14,9 @@ const geistMono = Geist_Mono({
 export const metadata = {
   title: "Invitación de Boda - Fernanda & Benjamín",
   description: "Únete a la celebración de nuestra boda. Confirma tu asistencia y elige tu regalo especial.",
+  icons: {
+    icon: "/logo.png",
+  },
 };
 
 export default function RootLayout({ children }) {
@@ -22,9 +25,6 @@ export default function RootLayout({ children }) {
       lang="es"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <head>
-        <link rel="icon" type="image/png" href="/logo.png?v=1" />
-      </head>
       <body className="min-h-full flex flex-col">{children}</body>
     </html>
   );
