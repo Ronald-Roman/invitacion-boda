@@ -191,7 +191,7 @@ export default function Home() {
           Ayudanos a reservarte {invitado.personas} lugar(es) para ti en nuestra boda!
         </p>
         <p className="bg-red-50 text-red-700 font-semibold text-center p-3 rounded-lg border border-red-300 my-4">
-          Favor recordar que esta invitacion es SIN Niños
+          Con mucho cariño, esta celebracion será solo para adultos. 
         </p>
 
 
