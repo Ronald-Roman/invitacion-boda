@@ -50,6 +50,11 @@ export default function Home() {
 
   async function confirmar() {
 
+    if (!regalo) {
+      alert("Por favor selecciona un regalo antes de confirmar tu asistencia.");
+      return;
+    }
+
     const params = new URLSearchParams(window.location.search);
     const codigo = params.get("codigo");
 
@@ -623,7 +628,7 @@ export default function Home() {
 
 
 
-      <button className={`btn-submit btn-rally ${yaConfirmado || !asistencia ? 'opacity-50 cursor-not-allowed' : ''}`} onClick={confirmar} disabled={yaConfirmado || !asistencia}>
+      <button className={`btn-submit btn-rally ${yaConfirmado || !asistencia || !regalo ? 'opacity-50 cursor-not-allowed' : ''}`} onClick={confirmar} disabled={yaConfirmado || !asistencia || !regalo}>
         <span className="tbtn-txt">{yaConfirmado ? 'Ya confirmado' : 'Confirmar asistencia'}</span>
         <div className="btn-car-container">
           <span className="smoke s1"></span>
