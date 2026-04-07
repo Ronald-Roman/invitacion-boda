@@ -79,7 +79,10 @@ export default function Home() {
       .eq("codigo", codigo);
 
     setYaConfirmado(true);
-    mostrarModal("¡Confirmación exitosa!", "Gracias por confirmar tu asistencia. ¡Te esperamos en nuestra boda! ❤️", "success");
+    const mensajeConfirmacion = asistencia === "si" 
+      ? "Gracias por confirmar tu asistencia. ¡Te esperamos en nuestra boda! ❤️" 
+      : "Lamentamos que no puedas asistir a nuestra boda. Tu presencia nos hubiera alegrado mucho. 😔";
+    mostrarModal("¡Confirmación exitosa!", mensajeConfirmacion, "success");
 
   }
 
