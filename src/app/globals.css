@@ -115,17 +115,16 @@ body {
 }
 
 .hero-eyebrow {
-  font-size: .68rem;
+  font-size: .78rem;
   letter-spacing: .38em;
-  text-transform: uppercase;
-  color: var(--text-soft);
+  color: #8e7d6f;
   margin-bottom: 28px;
   animation: riseIn .9s ease both;
 }
 
 .hero-names {
   font-family: 'Playfair Display', serif;
-  font-size: clamp(3.8rem, 11vw, 7.5rem);
+  font-size: clamp(2.8rem, 8vw, 3.5rem);
   font-weight: 400;
   font-style: italic;
   line-height: .95;
@@ -162,7 +161,7 @@ body {
 }
 
 .scroll-cue span {
-  font-size: .6rem;
+  font-size: .8rem;
   letter-spacing: .25em;
   text-transform: uppercase;
   color: var(--text-soft);

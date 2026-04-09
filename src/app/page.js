@@ -99,10 +99,10 @@ export default function Home() {
   if (invitado.error) {
     return (
       <div className="flex w-full h-screen items-center justify-center flex-col bg-[#fdfaf6] px-6 text-center">
-        <h1 className="text-3xl text-[var(--sage-deep)] mb-4" style={{ fontFamily: "'Playfair Display', serif" }}>
+        <h1 className="text-[var(--sage-deep)] mb-4" style={{ fontFamily: "'Playfair Display', serif", fontSize: 'clamp(2rem, 8vw, 3rem)' }}>
           Acceso Inválido
         </h1>
-        <p className="text-[var(--text-soft)] max-w-[400px]">
+        <p className="text-[var(--text-soft)] max-w-[500px] leading-relaxed" style={{ fontSize: 'clamp(0.9rem, 4vw, 1.1rem)' }}>
           Por favor, asegúrate de utilizar el enlace exacto que te enviaron los novios (el cual incluye tu código de invitado especial).
         </p>
       </div>
@@ -134,7 +134,12 @@ export default function Home() {
         <div className="petal" style={{ left: '80%', animationDelay: '7s' }}></div>
         <div className="petal" style={{ left: '90%', animationDelay: '8s' }}></div>
 
-        <div className="hero-eyebrow">Te invitamos a nuestra boda</div>
+        <div className="hero-amp" style={{ fontSize: 'clamp(0.8rem, 7vw, 2.5rem)' }}>
+            ¡NOS CASAMOS!
+        </div>
+        <div className="hero-eyebrow" style={{fontSize:'clamp(0.8rem, 3vw, 1.2rem)',fontWeight:'300',letterSpacing:'0.18em',opacity:'0.8'}}>
+          Y queremos que seas parte de este momento tan especial para nosotros.
+        </div>
 
         <div className="floral-frame">
           <svg className="floral-top" viewBox="0 0 200 60" xmlns="http://www.w3.org/2000/svg">
@@ -151,8 +156,10 @@ export default function Home() {
             <circle cx="165" cy="22" r="3" fill="var(--rose)" />
           </svg>
 
+          
+
           <div className="hero-names">
-            A. FERNANDA <span className="hero-amp">&</span> BENJAMIN
+            Angélica Fernanda Droguett Fontealba <span className="hero-amp">&</span> Benjamin Ezequiel Román Larenas
           </div>
 
           <svg className="floral-bottom" viewBox="0 0 200 60" xmlns="http://www.w3.org/2000/svg">
@@ -172,6 +179,13 @@ export default function Home() {
 
         <div className="hero-rule"></div>
 
+        <div className="hero-amp" style={{ fontSize: 'clamp(2.5rem, 7vw, .8rem)' }}>
+            21 NOVIEMBRE 2026
+        </div>
+        <div className="hero-amp" style={{ fontSize: 'clamp(2.5rem, 7vw, .8rem)' }}>
+            18:00 HRS
+        </div>
+
         <div className="scroll-cue">
           <span>Desliza</span>
           <div className="scroll-tick"></div>
@@ -187,10 +201,10 @@ export default function Home() {
 
         <h2>Hola! {invitado.nombre}</h2>
 
-        <p>
-          Ayudanos a reservarte {invitado.personas} lugar(es) para ti en nuestra boda!
+        <p style={{fontSize: 'clamp(1.0rem, 4vw, 1.3rem)', lineHeight: '1.6'}}>
+          Ayudanos a reservarte {invitado.personas} lugar(es) para usted(es) en nuestra boda!
         </p>
-        <p className="bg-red-50 text-red-700 font-semibold text-center p-3 rounded-lg border border-red-300 my-4">
+        <p className="bg-red-50 text-red-700 font-semibold text-center p-3 rounded-lg border border-red-300 my-4" style={{ fontSize: 'clamp(0.85rem, 3vw, 1rem)' }}>
           Con mucho cariño, esta celebracion será solo para adultos. 
         </p>
 
@@ -502,7 +516,7 @@ export default function Home() {
           <h2 className="sec-title relative z-10 m-0 leading-tight" style={{ fontSize: 'clamp(2rem, 5vw, 2.8rem)' }}>
             Datos Bancarios
           </h2>
-          <p className="text-[0.9rem] text-[var(--text-soft)] mt-4 max-w-sm font-light">
+          <p className="text-[0.9rem] text-[var(--text-soft)] mt-4 max-w-sm font-light" style={{ fontSize: 'clamp(0.85rem, 3vw, 1rem)' }}>
             Deposita tu regalo en la siguiente cuenta:
           </p>
         </div>
@@ -559,7 +573,7 @@ export default function Home() {
           </button>
 
           <div className="mt-6 pt-6 border-t border-[var(--sage)]/20 flex flex-col items-center text-center w-full">
-            <p className="text-[0.9rem] text-[var(--text-soft)] mb-5 max-w-xs font-light">
+            <p className="text-[0.9rem] text-[var(--text-soft)] mb-5 max-w-xs font-light" style={{ fontSize: 'clamp(0.85rem, 3vw, 1rem)' }}>
               Por favor, mándanos una foto o captura de tu comprobante a nuestro WhatsApp: +56950596046 ó
             </p>
             <a
@@ -578,7 +592,7 @@ export default function Home() {
       </section>
 
       <section className="sec">
-        <p className="text-[var(--text-soft)] text-sm font-light mb-4 text-center">
+        <p className="text-[var(--text-soft)] text-sm font-light mb-4 text-center" style={{ fontSize: 'clamp(0.9rem, 3vw, 1rem)' }}>
           Ahora la pregunta mas importante...
         </p>
 
@@ -599,7 +613,7 @@ export default function Home() {
           </svg>
 
           <h2 className="sec-title relative z-10 m-0 leading-tight" style={{ fontSize: 'clamp(2.5rem, 7vw, 3.5rem)' }}>
-            ¿Podrás acompañarnos?
+            ¿Podrán acompañarnos?
           </h2>
 
           <svg viewBox="0 0 200 60" className="w-[180px] sm:w-[200px] opacity-70 mt-[-10px]" style={{ display: 'block', margin: '0 auto' }}>
@@ -619,7 +633,7 @@ export default function Home() {
 
         <div className="toggle-group">
           <button className={`tbtn btn-rally ${asistencia === "si" ? "active" : ""} ${yaConfirmado ? 'opacity-50 cursor-not-allowed' : ''}`} onClick={() => !yaConfirmado && setAsistencia("si")} disabled={yaConfirmado}>
-            <span className="tbtn-txt">Sí, Feliz asistiré</span>
+            <span className="tbtn-txt">Sí, Feliz asistiré(mos)</span>
             <div className="btn-car-container">
               <span className="smoke s1"></span>
               <span className="smoke s2"></span>
@@ -628,7 +642,7 @@ export default function Home() {
             </div>
           </button>
           <button className={`tbtn btn-rally ${asistencia === "no" ? "active" : ""} ${yaConfirmado ? 'opacity-50 cursor-not-allowed' : ''}`} onClick={() => !yaConfirmado && setAsistencia("no")} disabled={yaConfirmado}>
-            <span className="tbtn-txt">No podré asistir, lo lamento</span>
+            <span className="tbtn-txt">No podré(mos) asistir, lo lamento</span>
             <div className="btn-car-container">
               <span className="smoke s1"></span>
               <span className="smoke s2"></span>
@@ -652,9 +666,12 @@ export default function Home() {
         </div>
       </button>
 
+      {/* Espaciador físico garantizado */}
+      <div className="w-full" style={{ height: '10px' }}></div>
+
       {yaConfirmado && (
         <div className="text-center mt-8 px-4">
-          <p className="text-[var(--text-soft)] text-sm font-light mb-4">
+          <p className="text-[var(--text-soft)] text-sm font-light mb-4" style={{ fontSize: 'clamp(0.9rem, 3vw, 1rem)' }}>
             ¡Gracias por confirmar! Si tienes alguna duda o cambio de opinión, contáctanos directamente al WhatsApp.
           </p>
           <a
@@ -673,7 +690,7 @@ export default function Home() {
 
       {!yaConfirmado && (
         <div className="text-center mt-8 px-4">
-          <p className="text-[var(--text-soft)] text-sm font-light">
+          <p className="text-[var(--text-soft)] text-sm font-light" style={{ fontSize: 'clamp(0.9rem, 3vw, 1rem)' }}>
             Cualquier duda o cambio de opinión, contáctanos directamente al WhatsApp: +56950596046
           </p>
         </div>
@@ -697,13 +714,12 @@ export default function Home() {
               )}
             </div>
 
-            {/* Título */}
-            <h3 className="text-2xl font-bold text-[var(--sage-deep)] mb-4" style={{ fontFamily: "'Playfair Display', serif" }}>
+            <h3 className="text-2xl font-bold text-[var(--sage-deep)] mb-4" style={{ fontFamily: "'Playfair Display', serif", fontSize: 'clamp(1.5rem, 5vw, 2rem)' }}>
               {modalTitle}
             </h3>
 
             {/* Mensaje */}
-            <p className="text-[var(--text)] mb-6 leading-relaxed">
+            <p className="text-[var(--text)] mb-6 leading-relaxed" style={{ fontSize: 'clamp(0.9rem, 3vw, 1rem)' }}>
               {modalMessage}
             </p>
 
