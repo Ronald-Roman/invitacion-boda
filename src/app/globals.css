@@ -115,6 +115,8 @@ body {
 }
 
 .hero-eyebrow {
+  position: center;
+  text-align: center;
   font-size: .78rem;
   letter-spacing: .38em;
   color: #8e7d6f;
@@ -138,6 +140,7 @@ body {
   display: block;
   font-size: .5em;
   margin: .12em 0;
+  text-align: center;
 }
 
 .hero-rule {
@@ -149,7 +152,7 @@ body {
 }
 
 .scroll-cue {
-  position: absolute;
+  position: center;
   bottom: 38px;
   left: 50%;
   transform: translateX(-50%);

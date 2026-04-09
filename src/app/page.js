@@ -137,7 +137,7 @@ export default function Home() {
         <div className="hero-amp" style={{ fontSize: 'clamp(0.8rem, 7vw, 2.5rem)' }}>
             ¡NOS CASAMOS!
         </div>
-        <div className="hero-eyebrow" style={{fontSize:'clamp(0.8rem, 3vw, 1.2rem)',fontWeight:'300',letterSpacing:'0.18em',opacity:'0.8'}}>
+        <div className="hero-eyebrow" style={{fontSize:'clamp(0.8rem, 3vw, 1.2rem)',fontWeight:'300',letterSpacing:'0.18em',opacity:'0.8', marginBottom:'0.5rem'}}>
           Y queremos que seas parte de este momento tan especial para nosotros.
         </div>
 
@@ -201,7 +201,7 @@ export default function Home() {
 
         <h2>Hola! {invitado.nombre}</h2>
 
-        <p style={{fontSize: 'clamp(1.0rem, 4vw, 1.3rem)', lineHeight: '1.6'}}>
+        <p style={{fontSize: 'clamp(.5rem, 4vw, 1.0rem)', lineHeight: '1.6'}}>
           Ayudanos a reservarte {invitado.personas} lugar(es) para usted(es) en nuestra boda!
         </p>
         <p className="bg-red-50 text-red-700 font-semibold text-center p-3 rounded-lg border border-red-300 my-4" style={{ fontSize: 'clamp(0.85rem, 3vw, 1rem)' }}>
