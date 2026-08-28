@@ -615,7 +615,7 @@ export default function Home() {
           <h2 className="sec-title relative z-10 m-0 leading-tight" style={{ fontSize: 'clamp(2.5rem, 7vw, 3.5rem)' }}>
             ¿Podrán acompañarnos?
             <div className="hero-eyebrow" style={{fontSize:'clamp(0.8rem, 3vw, 1.2rem)',fontWeight:'300',letterSpacing:'0.18em',opacity:'0.8', marginBottom:'0.5rem'}}>
-              Porfavor confirma tu asistencia antes de la informada en whatsapp.
+              Por favor confirmar su asistencia antes del 20 De Octubre.
             </div>    
           </h2>
 
