@@ -170,22 +170,104 @@ async function pedirSesion(codigo, archivo) {
 
 let siguienteId = 0;
 
+function cantidad(n, singular, plural) {
+  return `${n} ${n === 1 ? singular : plural}`;
+}
+
+function resumen({ fotos, videos }) {
+  return [fotos > 0 && cantidad(fotos, "foto", "fotos"), videos > 0 && cantidad(videos, "video", "videos")]
+    .filter(Boolean)
+    .join(" y ");
+}
+
+function Ornamento({ invertido }) {
+  return (
+    <svg viewBox="0 0 200 60" className="w-[160px] sm:w-[180px] opacity-70" style={{ display: 'block', margin: invertido ? '-8px auto 0' : '0 auto -12px' }}>
+      <path d={invertido ? "M20,20 Q60,50 100,20 T180,20" : "M20,40 Q60,10 100,40 T180,40"} fill="none" stroke="var(--sage-deep)" strokeWidth="1.5" />
+      <path d={invertido ? "M30,32 Q40,45 50,32 Q40,25 30,32" : "M30,28 Q40,15 50,28 Q40,35 30,28"} fill="var(--sage)" />
+      <path d={invertido ? "M150,32 Q160,45 170,32 Q160,25 150,32" : "M150,28 Q160,15 170,28 Q160,35 150,28"} fill="var(--sage)" />
+      <circle cx="100" cy={invertido ? 20 : 40} r="5" fill="var(--rose)" />
+    </svg>
+  );
+}
+
+function IconoCamara() {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" className="w-9 h-9" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.6}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+      <path strokeLinecap="round" strokeLinejoin="round" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+    </svg>
+  );
+}
+
+function Miniatura({ item }) {
+  const porcentaje = Math.round(item.progreso * 100);
+  return (
+    <div className="relative aspect-square rounded-xl overflow-hidden bg-gradient-to-br from-[var(--sky-soft)] to-[var(--blush)] shadow-sm">
+      {item.vista && !item.esVideo ? (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img src={item.vista} alt="" className="w-full h-full object-cover" />
+      ) : (
+        <div className="w-full h-full flex items-center justify-center text-2xl">{item.esVideo ? "🎬" : "📷"}</div>
+      )}
+
+      {item.estado === "pendiente" && <div className="absolute inset-0 bg-white/55" />}
+
+      {item.estado === "subiendo" && (
+        <div className="absolute inset-0 bg-black/35 flex items-center justify-center">
+          <span className="text-white text-sm font-bold drop-shadow">{porcentaje}%</span>
+          <div className="absolute bottom-0 left-0 h-1 bg-[var(--gold)] transition-all" style={{ width: `${porcentaje}%` }} />
+        </div>
+      )}
+
+      {item.estado === "listo" && (
+        <span className="absolute top-1 right-1 w-6 h-6 rounded-full bg-[var(--sage-deep)] text-white text-xs flex items-center justify-center shadow">✓</span>
+      )}
+
+      {item.estado === "error" && (
+        <div className="absolute inset-0 bg-red-500/45 flex items-center justify-center">
+          <span className="w-7 h-7 rounded-full bg-white text-red-600 font-bold flex items-center justify-center">!</span>
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default function SubirFotos({ codigo, estado }) {
 
   const [items, setItems] = useState([]);
   const [subiendo, setSubiendo] = useState(false);
+  const [compartidos, setCompartidos] = useState(null);
   const inputRef = useRef(null);
   const colaRef = useRef([]);
   const corriendoRef = useRef(false);
+  const vistasRef = useRef([]);
 
+  const activos = items.filter((i) => i.estado !== "error");
   const pendientes = items.filter((i) => i.estado === "pendiente" || i.estado === "subiendo").length;
   const listos = items.filter((i) => i.estado === "listo").length;
   const conError = items.filter((i) => i.estado === "error");
   const reintentables = conError.filter((i) => i.reintentable);
+  const progresoTotal = activos.length ? activos.reduce((suma, i) => suma + i.progreso, 0) / activos.length : 0;
+  const totalCompartidos = compartidos ? compartidos.fotos + compartidos.videos : 0;
 
   function actualizar(id, cambios) {
     setItems((prev) => prev.map((i) => (i.id === id ? { ...i, ...cambios } : i)));
   }
+
+  // Lo que el invitado ya subió (se lee desde Drive, así se mantiene aunque recargue o cambie de celular)
+  useEffect(() => {
+    fetch(`/api/fotos/subir?codigo=${encodeURIComponent(codigo)}`)
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => setCompartidos(data ?? { fotos: 0, videos: 0 }))
+      .catch(() => setCompartidos({ fotos: 0, videos: 0 }));
+  }, [codigo]);
+
+  // Liberar las miniaturas al salir
+  useEffect(() => {
+    const vistas = vistasRef.current;
+    return () => vistas.forEach((url) => URL.revokeObjectURL(url));
+  }, []);
 
   // Avisar si intentan cerrar la página con subidas en curso
   useEffect(() => {
@@ -246,6 +328,8 @@ export default function SubirFotos({ codigo, estado }) {
         await subirArchivo(url, archivo, (progreso) => actualizar(item.id, { progreso }));
         actualizar(item.id, { estado: "listo", progreso: 1, copia: null });
         item.copia = null; // liberar la copia
+        const tipo = item.esVideo ? "videos" : "fotos";
+        setCompartidos((c) => ({ ...(c ?? { fotos: 0, videos: 0 }), [tipo]: (c?.[tipo] ?? 0) + 1 }));
       } catch (e) {
         actualizar(item.id, { estado: "error", error: e.message, reintentable: !e.ilegible });
       }
@@ -272,7 +356,14 @@ export default function SubirFotos({ codigo, estado }) {
     for (const n of nuevos) {
       if (n.estado !== "pendiente") continue;
       n.copia = copiarArchivo(n.archivo);
-      n.copia.catch(() => {}); // el error se maneja al momento de subirlo
+      n.copia
+        .then((copia) => {
+          if (n.esVideo) return;
+          const vista = URL.createObjectURL(copia);
+          vistasRef.current.push(vista);
+          actualizar(n.id, { vista });
+        })
+        .catch(() => {}); // el error se maneja al momento de subirlo
     }
     setItems((prev) => [...prev, ...nuevos]);
     colaRef.current.push(...nuevos.filter((n) => n.estado === "pendiente"));
@@ -286,96 +377,119 @@ export default function SubirFotos({ codigo, estado }) {
   }
 
   return (
-    <section className="fotos w-full flex flex-col items-center py-16 px-4">
+    <section className="fotos w-full flex flex-col items-center pt-4 pb-12 md:pb-16 px-4">
 
-      <h2 className="sec-title text-center m-0 leading-tight" style={{ fontSize: 'clamp(2.2rem, 6vw, 3.2rem)' }}>
+      <Ornamento />
+      <h2 className="sec-title relative z-10 text-center m-0 leading-tight" style={{ fontSize: 'clamp(2.2rem, 6vw, 3.2rem)' }}>
         Fotos
       </h2>
+      <Ornamento invertido />
 
-      {estado === "cerrada" ? (
-        <p className="text-center text-[var(--text-soft)] mt-6 max-w-md" style={{ fontSize: 'clamp(0.9rem, 3vw, 1.05rem)' }}>
-          La subida de fotos ya cerró. ¡Gracias a todos por compartir sus recuerdos con nosotros! ❤️
-        </p>
-      ) : (
-        <div className="w-full max-w-md flex flex-col items-center mt-6">
+      <p className="text-center text-[var(--text-mid)] mt-4 mb-8 max-w-md leading-relaxed" style={{ fontSize: 'clamp(0.95rem, 3vw, 1.05rem)' }}>
+        {estado === "cerrada"
+          ? "Gracias a todos por compartir sus recuerdos con nosotros."
+          : "Revivamos juntos este día: compártenos las fotos y videos que tomaste. Solo nosotros los veremos."}
+      </p>
 
-          <p className="text-center text-[var(--text-mid)] mb-8 leading-relaxed" style={{ fontSize: 'clamp(0.9rem, 3vw, 1.05rem)' }}>
-            ¿Sacaste fotos o videos en la boda? ¡Compártelos con nosotros! Solo nosotros los veremos.
-          </p>
+      <div className="w-full max-w-md rounded-3xl bg-white/80 backdrop-blur-md border border-[var(--sage)]/30 shadow-[0_20px_50px_-20px_rgba(127,166,136,0.5)] overflow-hidden">
 
-          <input
-            ref={inputRef}
-            type="file"
-            accept="image/*,video/*"
-            multiple
-            className="hidden"
-            onChange={(e) => { agregar(e.target.files); e.target.value = ""; }}
-          />
+        <div className="h-1.5 bg-gradient-to-r from-[var(--sky)] via-[var(--blush-mid)] to-[var(--sage)]" />
 
-          <button
-            onClick={() => inputRef.current?.click()}
-            className="px-8 py-4 rounded-full uppercase tracking-[0.15em] text-[0.85rem] font-semibold text-white bg-[var(--sage-deep)] hover:bg-[var(--gold)] transition-all duration-300 shadow-lg hover:shadow-xl hover:-translate-y-1"
-          >
-            {items.length > 0 ? "Subir más fotos y videos" : "Subir fotos y videos"}
-          </button>
+        <div className="p-6 sm:p-8 flex flex-col items-center text-center">
 
-          <p className="text-center text-[var(--text-soft)] text-xs mt-3">
-            Puedes elegir varios a la vez · Videos de hasta {MAX_VIDEO_MB} MB
-          </p>
+          {totalCompartidos > 0 && (
+            <div className="mb-6 inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[var(--blush)]/70 border border-[var(--blush-mid)]/50 text-[var(--text)] text-sm">
+              <span>💛</span>
+              <span>Ya nos compartiste <strong className="font-semibold">{resumen(compartidos)}</strong></span>
+            </div>
+          )}
+
+          {estado === "cerrada" ? (
+            <div className="flex flex-col items-center gap-3 py-4">
+              <span className="text-4xl">📸</span>
+              <p className="text-[var(--text-mid)]">La subida de fotos ya cerró. ¡Gracias por acompañarnos! ❤️</p>
+            </div>
+          ) : (
+            <>
+              <input
+                ref={inputRef}
+                type="file"
+                accept="image/*,video/*"
+                multiple
+                className="hidden"
+                onChange={(e) => { agregar(e.target.files); e.target.value = ""; }}
+              />
+
+              <button
+                onClick={() => inputRef.current?.click()}
+                className="group w-full rounded-2xl border-2 border-dashed border-[var(--gold)]/50 bg-[var(--cream)] hover:bg-[var(--sky-pale)] hover:border-[var(--sage-deep)] transition-all duration-300 px-6 py-8 flex flex-col items-center gap-4"
+              >
+                <span className="w-20 h-20 rounded-full bg-gradient-to-br from-[var(--sage-deep)] to-[var(--rose)] text-white flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300">
+                  <IconoCamara />
+                </span>
+                <span className="text-[1.5rem] leading-tight text-[var(--text)]" style={{ fontFamily: "'Playfair Display', serif" }}>
+                  {items.length > 0 || totalCompartidos > 0 ? "Subir más recuerdos" : "Toca aquí para subir"}
+                </span>
+                <span className="text-sm text-[var(--text-soft)]">
+                  Fotos y videos · puedes elegir varios a la vez
+                </span>
+              </button>
+
+              <p className="text-xs text-[var(--text-soft)] mt-3">Videos de hasta {MAX_VIDEO_MB} MB</p>
+            </>
+          )}
 
           {items.length > 0 && (
-            <div className="w-full mt-8 bg-white/70 backdrop-blur-md rounded-2xl border border-[var(--sage)]/30 shadow-lg p-5">
+            <div className="w-full mt-8 pt-6 border-t border-[var(--sage)]/20">
 
-              <p className="text-center font-medium text-[var(--text)] mb-1">
+              <p className="font-medium text-[var(--text)] mb-3">
                 {pendientes > 0
-                  ? `Subiendo... ${listos} de ${listos + pendientes} listos`
+                  ? `Subiendo ${listos + 1} de ${listos + pendientes}...`
                   : conError.length === 0
-                    ? `¡Gracias! Recibimos tus ${listos} recuerdos ❤️`
-                    : `${listos} subidos, ${conError.length} con problemas`}
+                    ? "¡Listo! Tus recuerdos ya están con nosotros 🎉"
+                    : `${cantidad(listos, "archivo subido", "archivos subidos")} · ${conError.length} con problemas`}
               </p>
 
               {pendientes > 0 && (
-                <p className="text-center text-xs text-[var(--rose)] mb-3">Mantén esta página abierta hasta que termine. Si cambias de app, la subida se pausa y continúa al volver</p>
+                <>
+                  <div className="h-2 rounded-full bg-[var(--sage)]/25 overflow-hidden">
+                    <div
+                      className="h-full rounded-full bg-gradient-to-r from-[var(--sage-deep)] to-[var(--gold)] transition-all duration-300"
+                      style={{ width: `${Math.round(progresoTotal * 100)}%` }}
+                    />
+                  </div>
+                  <p className="text-xs text-[var(--rose)] mt-3 leading-relaxed">
+                    Mantén esta página abierta hasta que termine. Si cambias de app, la subida se pausa y continúa al volver.
+                  </p>
+                </>
               )}
 
-              <ul className="mt-3 flex flex-col gap-2 max-h-64 overflow-y-auto">
-                {items.map((item) => (
-                  <li key={item.id} className="text-sm">
-                    <div className="flex items-center justify-between gap-3">
-                      <span className="truncate text-[var(--text-mid)]">
-                        {item.esVideo ? "🎬" : "📷"} {item.archivo.name}
-                      </span>
-                      <span className="shrink-0 text-xs">
-                        {item.estado === "listo" && <span className="text-green-600">✓</span>}
-                        {item.estado === "pendiente" && <span className="text-[var(--text-soft)]">En espera</span>}
-                        {item.estado === "subiendo" && <span className="text-[var(--gold)]">{Math.round(item.progreso * 100)}%</span>}
-                        {item.estado === "error" && <span className="text-red-600">Error</span>}
-                      </span>
-                    </div>
-                    {item.estado === "subiendo" && (
-                      <div className="h-1 mt-1 rounded-full bg-[var(--sage)]/30 overflow-hidden">
-                        <div className="h-full bg-[var(--gold)] transition-all" style={{ width: `${item.progreso * 100}%` }} />
-                      </div>
-                    )}
-                    {item.estado === "error" && <p className="text-xs text-red-600 mt-0.5">{item.error}</p>}
-                  </li>
-                ))}
-              </ul>
+              <div className="grid grid-cols-4 gap-2 mt-5">
+                {items.map((item) => <Miniatura key={item.id} item={item} />)}
+              </div>
+
+              {conError.length > 0 && (
+                <ul className="mt-4 flex flex-col gap-1 text-left">
+                  {conError.map((item) => (
+                    <li key={item.id} className="text-xs text-red-600">
+                      <span className="font-medium">{item.archivo.name}:</span> {item.error}
+                    </li>
+                  ))}
+                </ul>
+              )}
 
               {!subiendo && reintentables.length > 0 && (
-                <div className="flex justify-center mt-4">
-                  <button
-                    onClick={reintentar}
-                    className="px-6 py-2 rounded-full text-sm font-medium text-[var(--sage-deep)] border border-[var(--sage-deep)] hover:bg-[var(--sage-deep)] hover:text-white transition-all"
-                  >
-                    Reintentar los que fallaron
-                  </button>
-                </div>
+                <button
+                  onClick={reintentar}
+                  className="mt-4 px-6 py-2 rounded-full text-sm font-medium text-[var(--sage-deep)] border border-[var(--sage-deep)] hover:bg-[var(--sage-deep)] hover:text-white transition-all"
+                >
+                  Reintentar los que fallaron
+                </button>
               )}
             </div>
           )}
         </div>
-      )}
+      </div>
 
     </section>
   );

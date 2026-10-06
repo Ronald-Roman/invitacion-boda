@@ -77,13 +77,41 @@ async function carpetaRaiz() {
   return raizId;
 }
 
+async function buscarCarpetaInvitado(codigo) {
+  const raiz = await carpetaRaiz();
+  const id = await buscarCarpeta(`'${raiz}' in parents and appProperties has { key='codigo' and value='${escapar(codigo)}' }`);
+  return { raiz, id };
+}
+
 // Una subcarpeta por invitado, identificada por su código (el nombre visible es el del invitado)
 export async function carpetaInvitado(codigo, nombre) {
-  const raiz = await carpetaRaiz();
-  return (
-    (await buscarCarpeta(`'${raiz}' in parents and appProperties has { key='codigo' and value='${escapar(codigo)}' }`)) ??
-    (await crearCarpeta(nombre || codigo, { codigo }, raiz))
-  );
+  const { raiz, id } = await buscarCarpetaInvitado(codigo);
+  return id ?? (await crearCarpeta(nombre || codigo, { codigo }, raiz));
+}
+
+// Cuántas fotos y videos ha subido un invitado (para mostrarlo aunque recargue la página)
+export async function contarArchivos(codigo) {
+  const { id } = await buscarCarpetaInvitado(codigo);
+  const cuenta = { fotos: 0, videos: 0 };
+  if (!id) return cuenta;
+
+  let pageToken;
+  do {
+    const params = new URLSearchParams({
+      q: `'${id}' in parents and trashed=false`,
+      fields: "nextPageToken, files(mimeType)",
+      pageSize: "1000",
+      ...(pageToken && { pageToken }),
+    });
+    const data = await (await drive(`${FILES_URL}?${params}`)).json();
+    for (const f of data.files) {
+      if (f.mimeType.startsWith("video/")) cuenta.videos++;
+      else if (f.mimeType.startsWith("image/")) cuenta.fotos++;
+    }
+    pageToken = data.nextPageToken;
+  } while (pageToken);
+
+  return cuenta;
 }
 
 // Crea una sesión de subida reanudable; el navegador sube el archivo directo a la URL devuelta

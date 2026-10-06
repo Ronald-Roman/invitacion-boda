@@ -56,11 +56,11 @@ const Countdown = () => {
     );
 
     return (
-        <section className="py-24 my-16 w-full flex flex-col items-center justify-center relative bg-transparent">
+        <section className="py-12 md:py-16 w-full flex flex-col items-center justify-center relative bg-transparent">
 
             {/* Título Estilizado */}
             <h3
-                className="text-[1.8rem] sm:text-[2.2rem] mb-12 text-[var(--text)] italic opacity-90 "
+                className="text-[1.8rem] sm:text-[2.2rem] mb-8 text-[var(--text)] italic opacity-90 "
                 style={{ fontFamily: "'Playfair Display', serif" }}
             >
                 Tan solo faltan...
@@ -75,7 +75,7 @@ const Countdown = () => {
             </div>
 
             {/* Separador romántico inferior */}
-            <div className="flex justify-center items-center mt-16 w-full opacity-60">
+            <div className="flex justify-center items-center mt-10 w-full opacity-60">
                 <div className="h-[1px] w-20 sm:w-32 bg-gradient-to-r from-transparent to-[var(--sage-deep)]"></div>
                 <svg viewBox="0 0 24 24" className="w-5 h-5 mx-4" fill="none" stroke="var(--sage-deep)" strokeWidth="1">
                     <path d="M12 4 C14 9, 20 12, 20 12 C20 12, 14 15, 12 20 C10 15, 4 12, 4 12 C4 12, 10 9, 12 4 Z" />

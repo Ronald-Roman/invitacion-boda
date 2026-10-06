@@ -1,10 +1,41 @@
 import { NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
 import { estadoFotos, MAX_FOTO_MB, MAX_VIDEO_MB } from "@/lib/fotos";
-import { carpetaInvitado, crearSesionSubida } from "@/lib/google-drive";
+import { carpetaInvitado, contarArchivos, crearSesionSubida } from "@/lib/google-drive";
 
 function error(mensaje, status) {
   return NextResponse.json({ error: mensaje }, { status });
+}
+
+// Cuántas fotos y videos ha compartido el invitado
+export async function GET(request) {
+
+  if (estadoFotos() === "pendiente") {
+    return error("La subida de fotos no está disponible en este momento.", 403);
+  }
+
+  const codigo = request.nextUrl.searchParams.get("codigo");
+  if (!codigo) {
+    return error("Falta el código de invitado.", 400);
+  }
+
+  const { data: invitado } = await supabase
+    .from("invitados")
+    .select("codigo")
+    .eq("codigo", codigo)
+    .single();
+
+  if (!invitado) {
+    return error("Código de invitado no válido.", 404);
+  }
+
+  try {
+    return NextResponse.json(await contarArchivos(codigo));
+  } catch (e) {
+    console.error(e);
+    return error("No pudimos revisar tus fotos.", 502);
+  }
+
 }
 
 export async function POST(request) {

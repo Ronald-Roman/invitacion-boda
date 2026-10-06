@@ -249,10 +249,10 @@ export default function Home() {
       <Carousel />
       <Countdown />
 
-      <section className="py-24 w-full bg-transparent overflow-hidden">
+      <section className="pt-4 pb-12 md:pb-16 w-full bg-transparent overflow-hidden">
 
         {/* Título estrictamente centrado */}
-        <div className="w-full flex flex-col items-center justify-center text-center px-4 mb-16 relative">
+        <div className="w-full flex flex-col items-center justify-center text-center px-4 mb-10 relative">
           <svg viewBox="0 0 200 60" className="w-[200px] sm:w-[240px] opacity-70 mb-[-12px]" style={{ display: 'block', margin: '0 auto' }}>
             <path d="M20,40 Q60,10 100,40 T180,40" fill="none" stroke="var(--sage-deep)" strokeWidth="1.5" />
             <path d="M30,28 Q40,15 50,28 Q40,35 30,28" fill="var(--sage)" />
@@ -335,7 +335,7 @@ export default function Home() {
       </section>
 
       {/* UBICACION EN EL MAPA */}
-      <section className="ubicacion py-16 md:py-24 w-full flex flex-col items-center bg-transparent mt-4">
+      <section className="ubicacion py-12 md:py-16 w-full flex flex-col items-center bg-transparent">
 
         {/* Título decorado de la Ubicación */}
         <div className="floral-frame mb-10 flex flex-col items-center text-center w-full px-4">
@@ -391,7 +391,7 @@ export default function Home() {
 
 
       {/* SELECCIONA TU REGALO */}
-      <section className="regalos py-16 md:py-24 w-full flex flex-col items-center bg-transparent mt-4">
+      <section className="regalos py-12 md:py-16 w-full flex flex-col items-center bg-transparent">
 
         {/* Título decorado */}
         <div className="floral-frame mb-12 flex flex-col items-center text-center w-full px-4">
@@ -477,7 +477,7 @@ export default function Home() {
         <div className="w-full" style={{ height: '50px' }}></div>
 
         {/* REGALO VIP*/}
-        <div className="w-full max-w-2xl mx-auto px-4 mb-20">
+        <div className="w-full max-w-2xl mx-auto px-4">
           <div
             className={`flex flex-col md:flex-row bg-[#1c221f] rounded-2xl overflow-hidden transition-all duration-500 shadow-2xl relative ${bloqueado ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'} ${regalo === "opcionVIP"
               ? 'border-2 border-[var(--gold)] shadow-[0_0_40px_rgba(215,181,109,0.5)] scale-[1.02]'
@@ -523,7 +523,7 @@ export default function Home() {
                 <button
                   onClick={(e) => { e.stopPropagation(); !bloqueado && setRegalo("opcionVIP"); }}
                   disabled={bloqueado}
-                  className={`px-10 py-3 uppercase tracking-[0.2em] text-[0.75rem] font-bold transition-all duration-300 w-full sm:w-auto rounded-full ${regalo === "opcionVIP"
+                  className={`px-8 py-3 uppercase tracking-[0.2em] text-[0.75rem] font-bold whitespace-nowrap transition-all duration-300 w-full sm:w-auto rounded-full ${regalo === "opcionVIP"
                     ? 'bg-[var(--gold)] text-[#1c221f] shadow-[0_0_15px_rgba(215,181,109,0.4)]'
                     : 'bg-transparent text-[var(--gold)] border border-[var(--gold)] hover:bg-[var(--gold)] hover:text-[#1c221f]'
                     } ${bloqueado ? 'opacity-50 cursor-not-allowed' : ''}`}
@@ -536,9 +536,6 @@ export default function Home() {
         </div>
 
       </section>
-
-      {/* Espaciador físico garantizado */}
-      <div className="w-full" style={{ height: '50px' }}></div>
 
       <section className="cuenta-deposito w-full flex flex-col items-center py-4 px-4 mb-10">
 

@@ -1,12 +1,15 @@
 @import "tailwindcss";
 
 
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
+/* En la capa base para que las clases de Tailwind (px-6, mb-4, etc.) puedan sobrescribirlo */
+@layer base {
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
 }
 
 :root {
@@ -239,7 +242,7 @@ body {
 
 /* ── SECTIONS ── */
 .sec {
-  padding: 88px 24px;
+  padding: 72px 24px 24px;
 }
 
 .sec-inner {
@@ -330,8 +333,9 @@ body {
 }
 
 .btn-submit {
-  width: 100%;
-  margin-top: 30px;
+  display: block;
+  width: min(calc(100% - 48px), 720px);
+  margin: 16px auto 0;
   padding: 18px;
   border: none;
   border-radius: 14px;
