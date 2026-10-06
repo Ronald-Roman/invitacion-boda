@@ -5,12 +5,17 @@ import { supabase } from "../lib/supabase";
 import Carousel from "@/components/carousel";
 import Countdown from "@/components/countdown";
 
+// Desde esta fecha (hora de Chile) se bloquean las confirmaciones para todos los invitados
+const CIERRE_CONFIRMACIONES = new Date("2026-10-08T00:00:00-03:00");
+
+
 export default function Home() {
 
   const [invitado, setInvitado] = useState(null);
   const [asistencia, setAsistencia] = useState("");
   const [regalo, setRegalo] = useState("");
   const [yaConfirmado, setYaConfirmado] = useState(false);
+  const [confirmacionesCerradas, setConfirmacionesCerradas] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [modalTitle, setModalTitle] = useState("");
   const [modalMessage, setModalMessage] = useState("");
@@ -23,7 +28,14 @@ export default function Home() {
     setShowModal(true);
   }
 
+  const bloqueado = yaConfirmado || confirmacionesCerradas;
+
   useEffect(() => {
+
+    if (new Date() >= CIERRE_CONFIRMACIONES) {
+      setConfirmacionesCerradas(true);
+      mostrarModal("Confirmaciones cerradas", "Las confirmaciones ya están cerradas, pero la invitación sigue disponible para que puedas revisarla. ¡Nos vemos en la boda! ❤️", "warning");
+    }
 
     const params = new URLSearchParams(window.location.search);
     const codigo = params.get("codigo");
@@ -47,6 +59,8 @@ export default function Home() {
           setYaConfirmado(true);
           setAsistencia(data.confirmado);
           setRegalo(data.regalo);
+        } else if (new Date() < CIERRE_CONFIRMACIONES) {
+          mostrarModal("¡Recuerda confirmar!", "El plazo para confirmar tu asistencia es hasta el 7 de octubre a las 23:59. ¡No te quedes fuera! ❤️", "warning");
         }
       } else {
         setInvitado({ error: true, dbError: true });
@@ -60,6 +74,8 @@ export default function Home() {
 
 
   async function confirmar() {
+
+    if (bloqueado) return;
 
     if (!regalo) {
       mostrarModal("¡Falta seleccionar regalo!", "Por favor selecciona un regalo antes de confirmar tu asistencia.", "warning");
@@ -396,11 +412,11 @@ export default function Home() {
             ].map((opt) => (
               <div
                 key={opt.id}
-                className={`flex flex-col bg-white/70 backdrop-blur-md rounded-2xl overflow-hidden transition-all duration-300 ${yaConfirmado ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'} w-full mx-auto max-w-sm md:max-w-none ${regalo === opt.id
+                className={`flex flex-col bg-white/70 backdrop-blur-md rounded-2xl overflow-hidden transition-all duration-300 ${bloqueado ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'} w-full mx-auto max-w-sm md:max-w-none ${regalo === opt.id
                   ? 'border-2 border-[var(--gold)] shadow-[0_0_20px_rgba(215,181,109,0.3)] scale-[1.02]'
                   : 'border border-[var(--sage)]/30 shadow-lg hover:shadow-xl hover:-translate-y-1'
                   }`}
-                onClick={() => !yaConfirmado && setRegalo(opt.id)}
+                onClick={() => !bloqueado && setRegalo(opt.id)}
               >
                 {/* Imagen estilo card-img-top */}
                 <div className="w-full h-48 md:h-56 overflow-hidden relative">
@@ -429,12 +445,12 @@ export default function Home() {
                   </div>
 
                   <button
-                    onClick={(e) => { e.stopPropagation(); !yaConfirmado && setRegalo(opt.id); }}
-                    disabled={yaConfirmado}
+                    onClick={(e) => { e.stopPropagation(); !bloqueado && setRegalo(opt.id); }}
+                    disabled={bloqueado}
                     className={`px-8 py-3 rounded-full uppercase tracking-[0.2em] text-[0.75rem] font-semibold transition-all duration-300 w-full sm:w-auto ${regalo === opt.id
                       ? 'bg-[var(--gold)] text-white shadow-md border border-[var(--gold)]'
                       : 'bg-transparent text-[var(--sage-deep)] border border-[var(--sage-deep)] hover:bg-[var(--sage-light)] hover:text-white hover:border-transparent'
-                      } ${yaConfirmado ? 'opacity-50 cursor-not-allowed' : ''}`}
+                      } ${bloqueado ? 'opacity-50 cursor-not-allowed' : ''}`}
                   >
                     {regalo === opt.id ? 'Elegido' : 'Elegir'}
                   </button>
@@ -450,11 +466,11 @@ export default function Home() {
         {/* REGALO VIP*/}
         <div className="w-full max-w-2xl mx-auto px-4 mb-20">
           <div
-            className={`flex flex-col md:flex-row bg-[#1c221f] rounded-2xl overflow-hidden transition-all duration-500 shadow-2xl relative ${yaConfirmado ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'} ${regalo === "opcionVIP"
+            className={`flex flex-col md:flex-row bg-[#1c221f] rounded-2xl overflow-hidden transition-all duration-500 shadow-2xl relative ${bloqueado ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'} ${regalo === "opcionVIP"
               ? 'border-2 border-[var(--gold)] shadow-[0_0_40px_rgba(215,181,109,0.5)] scale-[1.02]'
               : 'border border-[#3a4439] hover:shadow-[0_0_20px_rgba(215,181,109,0.2)] hover:-translate-y-1'
               }`}
-            onClick={() => !yaConfirmado && setRegalo("VIP")}
+            onClick={() => !bloqueado && setRegalo("VIP")}
           >
             {/* Imagen Especial VIP */}
             <div className="w-full md:w-5/12 h-64 md:h-auto overflow-hidden relative border-r border-[#3a4439]">
@@ -492,11 +508,12 @@ export default function Home() {
                   $400.000
                 </span>
                 <button
-                  onClick={(e) => { e.stopPropagation(); setRegalo("opcionVIP"); }}
+                  onClick={(e) => { e.stopPropagation(); !bloqueado && setRegalo("opcionVIP"); }}
+                  disabled={bloqueado}
                   className={`px-10 py-3 uppercase tracking-[0.2em] text-[0.75rem] font-bold transition-all duration-300 w-full sm:w-auto rounded-full ${regalo === "opcionVIP"
                     ? 'bg-[var(--gold)] text-[#1c221f] shadow-[0_0_15px_rgba(215,181,109,0.4)]'
                     : 'bg-transparent text-[var(--gold)] border border-[var(--gold)] hover:bg-[var(--gold)] hover:text-[#1c221f]'
-                    }`}
+                    } ${bloqueado ? 'opacity-50 cursor-not-allowed' : ''}`}
                 >
                   {regalo === "opcionVIP" ? 'ELEGIDO' : 'ELEGIR VIP'}
                 </button>
@@ -615,7 +632,7 @@ export default function Home() {
           <h2 className="sec-title relative z-10 m-0 leading-tight" style={{ fontSize: 'clamp(2.5rem, 7vw, 3.5rem)' }}>
             ¿Podrán acompañarnos?
             <div className="hero-eyebrow" style={{fontSize:'clamp(0.8rem, 3vw, 1.2rem)',fontWeight:'300',letterSpacing:'0.18em',opacity:'0.8', marginBottom:'0.5rem'}}>
-              Por favor confirmar su asistencia antes del 20 De Octubre.
+              {confirmacionesCerradas ? '¡Gracias a todos! Es hora de disfrutar' : '¡Nos encantaría contar con ustedes!'}
             </div>    
           </h2>
 
@@ -635,7 +652,7 @@ export default function Home() {
         </div>
 
         <div className="toggle-group">
-          <button className={`tbtn btn-rally ${asistencia === "si" ? "active" : ""} ${yaConfirmado ? 'opacity-50 cursor-not-allowed' : ''}`} onClick={() => !yaConfirmado && setAsistencia("si")} disabled={yaConfirmado}>
+          <button className={`tbtn btn-rally ${asistencia === "si" ? "active" : ""} ${bloqueado ? 'opacity-50 cursor-not-allowed' : ''}`} onClick={() => !bloqueado && setAsistencia("si")} disabled={bloqueado}>
             <span className="tbtn-txt">Sí, Feliz asistiré(mos)</span>
             <div className="btn-car-container">
               <span className="smoke s1"></span>
@@ -644,7 +661,7 @@ export default function Home() {
               <img src="/subaru.png?v=3" alt="" className="btn-car" />
             </div>
           </button>
-          <button className={`tbtn btn-rally ${asistencia === "no" ? "active" : ""} ${yaConfirmado ? 'opacity-50 cursor-not-allowed' : ''}`} onClick={() => !yaConfirmado && setAsistencia("no")} disabled={yaConfirmado}>
+          <button className={`tbtn btn-rally ${asistencia === "no" ? "active" : ""} ${bloqueado ? 'opacity-50 cursor-not-allowed' : ''}`} onClick={() => !bloqueado && setAsistencia("no")} disabled={bloqueado}>
             <span className="tbtn-txt">No podré(mos) asistir, lo lamento</span>
             <div className="btn-car-container">
               <span className="smoke s1"></span>
@@ -659,8 +676,8 @@ export default function Home() {
 
 
 
-      <button className={`btn-submit btn-rally ${yaConfirmado || !asistencia ? 'opacity-50 cursor-not-allowed' : ''}`} onClick={confirmar} disabled={yaConfirmado || !asistencia}>
-        <span className="tbtn-txt">{yaConfirmado ? 'Ya confirmado' : 'Confirmar asistencia'}</span>
+      <button className={`btn-submit btn-rally ${bloqueado || !asistencia ? 'opacity-50 cursor-not-allowed' : ''}`} onClick={confirmar} disabled={bloqueado || !asistencia}>
+        <span className="tbtn-txt">{yaConfirmado ? 'Ya confirmado' : confirmacionesCerradas ? 'Confirmaciones cerradas' : 'Confirmar asistencia'}</span>
         <div className="btn-car-container">
           <span className="smoke s1"></span>
           <span className="smoke s2"></span>
