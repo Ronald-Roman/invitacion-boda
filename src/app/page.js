@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 import { supabase } from "../lib/supabase";
 import Carousel from "@/components/carousel";
 import Countdown from "@/components/countdown";
+import SubirFotos from "@/components/subir_fotos";
+import { estadoFotos } from "@/lib/fotos";
 
 // Desde esta fecha (hora de Chile) se bloquean las confirmaciones para todos los invitados
 const CIERRE_CONFIRMACIONES = new Date("2026-10-08T00:00:00-03:00");
@@ -16,6 +18,7 @@ export default function Home() {
   const [regalo, setRegalo] = useState("");
   const [yaConfirmado, setYaConfirmado] = useState(false);
   const [confirmacionesCerradas, setConfirmacionesCerradas] = useState(false);
+  const [fotos, setFotos] = useState("pendiente");
   const [showModal, setShowModal] = useState(false);
   const [modalTitle, setModalTitle] = useState("");
   const [modalMessage, setModalMessage] = useState("");
@@ -32,8 +35,16 @@ export default function Home() {
 
   useEffect(() => {
 
+    const estadoActualFotos = estadoFotos();
+    setFotos(estadoActualFotos);
+
     if (new Date() >= CIERRE_CONFIRMACIONES) {
       setConfirmacionesCerradas(true);
+    }
+
+    if (estadoActualFotos === "abierta") {
+      mostrarModal("¡Comparte tus fotos!", "Ya puedes subir las fotos y videos que tomaste en la boda en la sección «Fotos», justo debajo de tu saludo. ¡Gracias por acompañarnos! ❤️", "success");
+    } else if (new Date() >= CIERRE_CONFIRMACIONES) {
       mostrarModal("Confirmaciones cerradas", "Las confirmaciones ya están cerradas, pero la invitación sigue disponible para que puedas revisarla. ¡Nos vemos en la boda! ❤️", "warning");
     }
 
@@ -232,6 +243,8 @@ export default function Home() {
         </div>
 
       </section>
+
+      {fotos !== "pendiente" && <SubirFotos codigo={invitado.codigo} estado={fotos} />}
 
       <Carousel />
       <Countdown />
