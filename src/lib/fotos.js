@@ -13,3 +13,12 @@ export function estadoFotos(ahora = new Date()) {
   if (ahora < CIERRE_FOTOS) return "abierta";
   return "cerrada";
 }
+
+// Los mensajes y deseos se pueden dejar desde ya y hasta que cierre la subida de fotos
+export const MAX_MENSAJE = 1500;
+export const MAX_AUTOR = 60;
+export const MAX_MENSAJES_POR_INVITACION = 10;
+
+export function mensajesAbiertos(ahora = new Date()) {
+  return ahora < CIERRE_FOTOS;
+}

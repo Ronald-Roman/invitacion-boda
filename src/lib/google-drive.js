@@ -132,3 +132,75 @@ export async function crearSesionSubida({ carpeta, nombre, tipo, tamano, fecha, 
   });
   return res.headers.get("location");
 }
+
+// Mensajes y deseos: cada uno es un archivo de texto en la carpeta del invitado.
+// Una invitación puede dejar varios (por ejemplo, uno por persona) y editarlos después.
+const FIRMA = "\n\n— ";
+const BOM = String.fromCharCode(0xfeff); // para que Drive muestre bien los acentos y emojis
+const UPLOAD_FILES_URL = "https://www.googleapis.com/upload/drive/v3/files";
+
+function cuerpoMultipart(metadata, contenido) {
+  const limite = "mensaje-boda";
+  return {
+    headers: { "Content-Type": `multipart/related; boundary=${limite}` },
+    body:
+      `--${limite}\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n${JSON.stringify(metadata)}\r\n` +
+      `--${limite}\r\nContent-Type: text/plain; charset=UTF-8\r\n\r\n${contenido}\r\n--${limite}--`,
+  };
+}
+
+async function listarMensajes(carpeta) {
+  const params = new URLSearchParams({
+    q: `'${carpeta}' in parents and trashed=false and appProperties has { key='rol' and value='mensaje' }`,
+    fields: "files(id, appProperties)",
+    orderBy: "createdTime",
+    pageSize: "100",
+  });
+  return (await (await drive(`${FILES_URL}?${params}`)).json()).files;
+}
+
+export async function leerMensajes(codigo) {
+  const { id: carpeta } = await buscarCarpetaInvitado(codigo);
+  if (!carpeta) return [];
+  const archivos = await listarMensajes(carpeta);
+  return Promise.all(
+    archivos.map(async (f) => {
+      const texto = (await (await drive(`${FILES_URL}/${f.id}?alt=media`)).text()).trimStart(); // quita también el BOM
+      const firma = texto.lastIndexOf(FIRMA);
+      return {
+        id: f.id,
+        autor: f.appProperties?.autor ?? "",
+        mensaje: firma >= 0 ? texto.slice(0, firma) : texto,
+      };
+    })
+  );
+}
+
+// Crea un mensaje nuevo o, si viene `id`, reemplaza uno existente del mismo invitado.
+// Devuelve el id del archivo, o null si el `id` no es de este invitado.
+export async function guardarMensaje({ codigo, nombreInvitado, autor, mensaje, id, maximo }) {
+  // Al editar no se crea la carpeta: si no existe, el mensaje no es de este invitado
+  const carpeta = id ? (await buscarCarpetaInvitado(codigo)).id : await carpetaInvitado(codigo, nombreInvitado);
+  if (!carpeta) return null;
+  const existentes = await listarMensajes(carpeta);
+  const firmante = autor || nombreInvitado?.trim() || codigo;
+  const contenido = BOM + mensaje + FIRMA + firmante;
+  const metadata = {
+    name: `💌 Mensaje de ${firmante}.txt`,
+    appProperties: { rol: "mensaje", autor },
+  };
+
+  if (id) {
+    if (!existentes.some((f) => f.id === id)) return null;
+    const { headers, body } = cuerpoMultipart(metadata, contenido);
+    await drive(`${UPLOAD_FILES_URL}/${id}?uploadType=multipart&fields=id`, { method: "PATCH", headers, body });
+    return id;
+  }
+
+  if (existentes.length >= maximo) {
+    throw Object.assign(new Error("máximo de mensajes"), { limite: true });
+  }
+  const { headers, body } = cuerpoMultipart({ ...metadata, mimeType: "text/plain", parents: [carpeta] }, contenido);
+  const res = await drive(`${UPLOAD_FILES_URL}?uploadType=multipart&fields=id`, { method: "POST", headers, body });
+  return (await res.json()).id;
+}

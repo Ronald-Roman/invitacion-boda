@@ -5,7 +5,8 @@ import { supabase } from "../lib/supabase";
 import Carousel from "@/components/carousel";
 import Countdown from "@/components/countdown";
 import SubirFotos from "@/components/subir_fotos";
-import { estadoFotos } from "@/lib/fotos";
+import Mensaje from "@/components/mensaje";
+import { estadoFotos, mensajesAbiertos } from "@/lib/fotos";
 
 // Desde esta fecha (hora de Chile) se bloquean las confirmaciones para todos los invitados
 const CIERRE_CONFIRMACIONES = new Date("2026-10-08T00:00:00-03:00");
@@ -19,6 +20,7 @@ export default function Home() {
   const [yaConfirmado, setYaConfirmado] = useState(false);
   const [confirmacionesCerradas, setConfirmacionesCerradas] = useState(false);
   const [fotos, setFotos] = useState("pendiente");
+  const [mensajes, setMensajes] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [modalTitle, setModalTitle] = useState("");
   const [modalMessage, setModalMessage] = useState("");
@@ -37,6 +39,7 @@ export default function Home() {
 
     const estadoActualFotos = estadoFotos();
     setFotos(estadoActualFotos);
+    setMensajes(mensajesAbiertos());
 
     if (new Date() >= CIERRE_CONFIRMACIONES) {
       setConfirmacionesCerradas(true);
@@ -245,6 +248,8 @@ export default function Home() {
       </section>
 
       {fotos !== "pendiente" && <SubirFotos codigo={invitado.codigo} estado={fotos} />}
+
+      {mensajes && <Mensaje codigo={invitado.codigo} />}
 
       <Carousel />
       <Countdown />
