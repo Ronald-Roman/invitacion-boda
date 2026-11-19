@@ -45,10 +45,12 @@ export default function Home() {
       setConfirmacionesCerradas(true);
     }
 
-    if (estadoActualFotos === "abierta") {
-      mostrarModal("¡Comparte tus fotos!", "Ya puedes subir las fotos y videos que tomaste en la boda en la sección «Fotos», justo debajo de tu saludo. ¡Gracias por acompañarnos! ❤️", "success");
+    if (estadoActualFotos === "cerrada") {
+      mostrarModal("¡Gracias por acompañarnos!", "La subida de fotos y los mensajes ya cerraron. Gracias por ser parte de nuestro día ❤️", "success");
+    } else if (estadoActualFotos === "abierta") {
+      mostrarModal("¡Comparte tus fotos!", "Ya puedes subir las fotos y videos que tomaste en la sección «Fotos», y dejarnos un mensaje en «Buenos deseos». ¡Gracias por acompañarnos! ❤️", "success");
     } else if (new Date() >= CIERRE_CONFIRMACIONES) {
-      mostrarModal("Confirmaciones cerradas", "Las confirmaciones ya están cerradas, pero la invitación sigue disponible para que puedas revisarla. ¡Nos vemos en la boda! ❤️", "warning");
+      mostrarModal("¡Déjanos tus buenos deseos!", "Las confirmaciones ya están cerradas, pero puedes dejarnos un mensaje para nuestro matrimonio en la sección «Buenos deseos». ¡Nos vemos en la boda! ❤️", "success");
     }
 
     const params = new URLSearchParams(window.location.search);
